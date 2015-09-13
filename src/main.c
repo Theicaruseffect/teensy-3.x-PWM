@@ -1,81 +1,34 @@
-#include "common.h"
-#include "arm_cm4.h"
 #include "pwm.h"
 
-#define LED_ON  GPIOC_PSOR=(1<<5)
-#define LED_OFF GPIOC_PCOR=(1<<5)
 
-struct teensy_pwm_pin_setup
-{
-	int pin;
-	int port;
-	int channel;
-	int ftm;
-	int pcr_mux;
-	int pcr;
-};
-
-struct teensy_pwm_clk_setup
-{
-	int freq;
-	int duty;
-};
-
-void init_teensy_setup(int teensy_pin, struct teensy_pwm_pin_setup *setup)
-{
-	int base_pcr_addr = 0;
-
-	switch (teensy_pin) {
-	case 3:
-		base_pcr_addr = 12;
-		break;
-	}
-}
 int main(void)
 {
-
-	const int pulseWidth = 2000;
-	const int dutyCycle = 25; //In percentage
-	const int dutyCycleVal = pulseWidth / 100 * dutyCycle;
-	int i;
-
-
-	pwm_init(pulseWidth);
-
-	pwm_set(0, dutyCycleVal);
-
-/*
-	pwm_set(1, dutyCycleVal);
-
-
-	pwm_set(2, dutyCycleVal);
-	pwm_set(3, dutyCycleVal);
-
-	pwm_set(4, dutyCycleVal);
-
-	pwm_set(5, dutyCycleVal);
-	pwm_set(6, dutyCycleVal);
-	pwm_set(7, dutyCycleVal);
-*/
-
-	//usb_init();
-	PORTD_PCR5 |= PORT_PCR_ISF_MASK;
-	enable_irq(IRQ(INT_PORTD));
-	EnableInterrupts
-
-	while(1)
-	{}
+                
+	const uint32_t pulseWidth = 5000;
+	const uint32_t dutyCyclePercent = 10;
+	const uint32_t dutyCycleVal = pulseWidth / 100 * (100 - dutyCyclePercent);
+        uint32_t i = 0;
+        struct teensy_pwm_setup pwm_setup;
+        
+        const uint32_t pwm_pins[TEENSY_PWM_NUM] = {
+            TEENSY_PWM_PIN_3,TEENSY_PWM_PIN_4,TEENSY_PWM_PIN_5,
+            TEENSY_PWM_PIN_6,TEENSY_PWM_PIN_9,TEENSY_PWM_PIN_10,
+            TEENSY_PWM_PIN_20,TEENSY_PWM_PIN_21,TEENSY_PWM_PIN_22,
+            TEENSY_PWM_PIN_23,TEENSY_PWM_PIN_25,TEENSY_PWM_PIN_32
+        };
+        
+        for (i = 0; i < TEENSY_PWM_NUM; i++) {
+        
+            pwm_setup.clk_setup.pulse_width = pulseWidth;
+            pwm_setup.clk_setup.duty_cycle = dutyCycleVal;
+            pwm_setup.clk_setup.clock_source = 1;
+            pwm_setup.clk_setup.pre_scalar = 2;
+            
+            init_pwm_ports(pwm_pins[i], &pwm_setup);        
+            init_pwm_clk(&pwm_setup);
+            set_pwm(&pwm_setup);
+            
+        }
 
 	return  0;
-}
-
-
-void PORTD_IRQHandler(void)
-{
-
-	LED_ON;
-
-	
-
-	PORTD_PCR5 |= PORT_PCR_ISF_MASK;
 }

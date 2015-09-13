@@ -9,21 +9,49 @@
 #include "MK20D7.h"
 
 /* These map the PWM pins on the teensy with their relative PCR registers */
-#define TEENSY_PWM_PIN_3	PORTA_PCR12
-#define TEENSY_PWM_PIN_4 	PORTA_PCR13
-#define TEENSY_PWM_PIN_5	PORTD_PCR7
-#define TEENSY_PWM_PIN_6	PORTD_PCR4
-#define TEENSY_PWM_PIN_9	PORTC_PCR3
-#define TEENSY_PWM_PIN_10	PORTC_PCR4
-#define TEENSY_PWM_PIN_20	PORTD_PCR5
-#define TEENSY_PWM_PIN_21	PORTD_PCR6
-#define TEENSY_PWM_PIN_22	PORTC_PCR1
-#define TEENSY_PWM_PIN_23	PORTC_PCR2
-#define TEENSY_PWM_PIN_25	PORTB_PCR19
-#define TEENSY_PWM_PIN_32	PORTB_PCR18
+#define TEENSY_PWM_PIN_3	3
+#define TEENSY_PWM_PIN_4 	4
+#define TEENSY_PWM_PIN_5	5
+#define TEENSY_PWM_PIN_6	6
+#define TEENSY_PWM_PIN_9	9
+#define TEENSY_PWM_PIN_10	10
+#define TEENSY_PWM_PIN_20	20
+#define TEENSY_PWM_PIN_21	21
+#define TEENSY_PWM_PIN_22	22
+#define TEENSY_PWM_PIN_23	23
+#define TEENSY_PWM_PIN_25	25
+#define TEENSY_PWM_PIN_32	32
+#define TEENSY_PWM_NUM	        12
+#define PWM_CnSC (FTM_CnSC_MSB_MASK | FTM_CnSC_ELSB_MASK)
 
+struct teensy_pwm_pin_setup
+{
+	uint32_t pin;
+	uint32_t port;
+	uint32_t mux;
+	uint32_t pcr;
+	uint32_t channel_en;
+};
 
-void pwm_init(uint16_t mod);
-void pwm_set(uint8_t chan, uint16_t value);
+struct teensy_pwm_clk_setup
+{
+	uint32_t pulse_width;
+	uint32_t duty_cycle;
+	uint32_t ftm;
+        uint32_t sim_ftm_cs_mask;
+        uint32_t clock_source;
+        uint32_t pre_scalar;
+};
+
+struct teensy_pwm_setup
+{
+	struct teensy_pwm_clk_setup clk_setup;
+	struct teensy_pwm_pin_setup pin_setup;
+};
+
+uint32_t set_pwm(struct teensy_pwm_setup *pwm_setup);
+uint32_t init_pwm_clk(struct teensy_pwm_setup *pwm_setup);
+uint32_t init_pwm_ports(uint32_t teensy_pin, struct teensy_pwm_setup *teensy_setup);
+
 
 #endif // _PWM_H_
